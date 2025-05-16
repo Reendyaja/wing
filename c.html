@@ -169,58 +169,50 @@
     }
 
     async function fetchData() {
-        try {
-            const curRes = await fetch("https://didihub50.com/api/main/lottery/curRound?type=2");
-            const curData = await curRes.json();
+    try {
+        const res = await fetch("https://didihub.rf.gd/proxy_sc.php");
+        const data = await res.json();
 
-            const roundsRes = await fetch("https://didihub50.com/api/main/lottery/rounds?page=1&count=11&type=2");
-            const roundsData = await roundsRes.json();
+        const now = new Date();
+        const currentTime = now.toLocaleTimeString();
 
-            const data = {
-                period: curData.period || "-",
-                items: roundsData.items || []
-            };
+        document.getElementById("period").innerText = data.period;
 
-            const now = new Date();
-            const currentTime = now.toLocaleTimeString();
+        const items = data.items;
+        if (items.length > 11) {
+            const second = items[0].number;
+            const twelfth = items[11].number;
+            const digit = (second + twelfth) % 10;
 
-            document.getElementById("period").innerText = data.period;
+            const digitEl = document.getElementById("digit");
+            digitEl.innerText = digit;
+            digitEl.className = getDigitColorClass(digit);
 
-            const items = data.items;
-            if (items.length > 11) {
-                const second = items[0].number;
-                const twelfth = items[11].number;
-                const digit = (second + twelfth) % 10;
-
-                const digitEl = document.getElementById("digit");
-                digitEl.innerText = digit;
-                digitEl.className = getDigitColorClass(digit);
-
-                if (lastDigit !== null && digit !== lastDigit) {
-                    console.log("Digit berubah: " + digit);
-                }
-                lastDigit = digit;
-
-                const roundsList = document.getElementById("roundsList");
-                roundsList.innerHTML = "";
-                items.forEach(item => {
-                    const li = document.createElement("li");
-                    li.innerHTML = `<span>${item.period}</span>
-                                    <span class="${getDigitColorClass(item.number)}">${item.number}</span>
-                                    <span>${getColorEmoji(item.number)}</span>`;
-                    roundsList.appendChild(li);
-                });
-            } else {
-                console.warn("Data items kurang dari 12, tidak bisa menghitung digit.");
-                document.getElementById("digit").innerText = "-";
+            if (lastDigit !== null && digit !== lastDigit) {
+                console.log("Digit berubah: " + digit);
             }
+            lastDigit = digit;
 
-            document.getElementById("now").innerText = currentTime;
-
-        } catch (e) {
-            console.error("Gagal ambil data:", e);
+            const roundsList = document.getElementById("roundsList");
+            roundsList.innerHTML = "";
+            items.forEach(item => {
+                const li = document.createElement("li");
+                li.innerHTML = `<span>${item.period}</span>
+                                <span class="${getDigitColorClass(item.number)}">${item.number}</span>
+                                <span>${getColorEmoji(item.number)}</span>`;
+                roundsList.appendChild(li);
+            });
+        } else {
+            console.warn("Data items kurang dari 12, tidak bisa menghitung digit.");
+            document.getElementById("digit").innerText = "-";
         }
+
+        document.getElementById("now").innerText = currentTime;
+
+    } catch (e) {
+        console.error("Gagal ambil data:", e);
     }
+}
 
     fetchData();
     setInterval(fetchData, 1000);
