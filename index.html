@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Button Navigation</title>
+    <style>
+        body {
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 5px;
+            cursor: pointer;
+            color: white;
+            background-color: #4CAF50;
+            width: 150px;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <a href="sc.html" class="button">SUPER CEPAT</a>
+        <a href="c.html" class="button">CEPAT</a>
+        <a href="st.html" class="button">STANDAR</a>
+    </div>
+    <script>
+        window.addEventListener('beforeunload', function (event) {
+            sessionStorage.setItem('isRefreshing', 'true');
+        });
+        window.addEventListener('load', function () {
+            if (sessionStorage.getItem('isRefreshing') === 'true' && window.location.pathname.endsWith('index.html')) {
+                sessionStorage.removeItem('isRefreshing');
+                window.location.href = 'index.html';
+            } else {
+                sessionStorage.removeItem('isRefreshing');
+            }
+        });
+    </script>
+</body>
+</html>
