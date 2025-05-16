@@ -172,7 +172,7 @@
     try {
         const res = await fetch("https://didihub.rf.gd/proxy_c.php");
         const data = await res.json();
-        console.log("Data dari proxy:", data); // Debug data
+        console.log("Data dari proxy:", data);
 
         const now = new Date();
         const currentTime = now.toLocaleTimeString();
@@ -180,12 +180,12 @@
         document.getElementById("period").innerText = data.period;
 
         const items = data.items;
-        console.log("Jumlah items:", items.length); // Debug jumlah items
-        if (items.length > 11) {
+        console.log("Jumlah items:", items.length);
+        if (items.length >= 2) { // Minimal 2 elemen untuk menghitung digit
             const second = items[0].number;
-            const twelfth = items[11].number;
-            console.log("Second number:", second, "Twelfth number:", twelfth); // Debug nilai number
-            const digit = (second + twelfth) % 10;
+            const last = items[items.length - 1].number; // Gunakan elemen terakhir
+            console.log("Second number:", second, "Last number:", last);
+            const digit = (second + last) % 10;
 
             const digitEl = document.getElementById("digit");
             digitEl.innerText = digit;
@@ -206,7 +206,7 @@
                 roundsList.appendChild(li);
             });
         } else {
-            console.warn("Data items kurang dari 12, tidak bisa menghitung digit.");
+            console.warn("Data items kurang dari 2, tidak bisa menghitung digit.");
             document.getElementById("digit").innerText = "-";
         }
 
