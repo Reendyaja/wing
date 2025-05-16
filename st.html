@@ -6,8 +6,8 @@
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
-            background-color: #2E3B4E; /* Dark background from the image */
-            color: #FFFFFF; /* White text for contrast */
+            background-color: #2E3B4E;
+            color: #FFFFFF;
         }
 
         .data-what {
@@ -24,11 +24,10 @@
             font-size: 14px;
         }
         
-        /* Styling untuk header data atas */
         .data-header {
             font-weight: bold;
             padding: 8px;
-            background-color: #3A4A61; /* Slightly lighter dark shade */
+            background-color: #3A4A61;
             border-radius: 10px;
             display: flex;
             justify-content: space-between;
@@ -40,7 +39,6 @@
             font-size: 14px;
         }
 
-        /* Styling untuk data horizontal atas */
         .data-row {
             padding: 8px;
             display: flex;
@@ -55,13 +53,11 @@
             font-size: 14px;
         }
 
-        /* Warna untuk digit dan item.number */
-        .digit-red { color: #FF5C5C; font-weight: bold; } /* Red from the image */
-        .digit-green { color: #4CAF50; font-weight: bold; } /* Green from the image */
-        .digit-purple { color: #AB47BC; font-weight: bold; } /* Purple from the image */
-        .digit-blue { color: #42A5F5; font-weight: bold; } /* Blue from the image */
+        .digit-red { color: #FF5C5C; font-weight: bold; }
+        .digit-green { color: #4CAF50; font-weight: bold; }
+        .digit-purple { color: #AB47BC; font-weight: bold; }
+        .digit-blue { color: #42A5F5; font-weight: bold; }
 
-        /* Styling untuk header daftar rounds */
         .list-header {
             font-weight: bold;
             padding: 8px;
@@ -77,13 +73,12 @@
             font-size: 14px;
         }
 
-        /* Styling untuk list rounds */
         .rounds-list {
             list-style: none;
             padding: 0;
             margin-top: 10px;
             max-height: 300px;
-            overflow-y: auto; /* Scrollable list */
+            overflow-y: auto;
         }
         .rounds-list li {
             padding: 8px;
@@ -99,7 +94,6 @@
             font-size: 14px;
         }
 
-        /* Button styles */
         .button {
             padding: 10px 20px;
             border: none;
@@ -116,36 +110,30 @@
     </style>
 </head>
 <body>
-
 <div class="data-what">
     <span>PREDIKSI WINGO - STANDAR</span>
 </div>
 
-<!-- Header untuk data atas -->
 <div class="data-header">
     <span>PERIODE</span>
     <span>NUMBER</span>
     <span>WAKTU</span>
 </div>
 
-<!-- Data horizontal atas -->
 <div class="data-row" id="dataRow">
     <span id="period">-</span>
     <span id="digit">-</span>
     <span id="now">-</span>
 </div>
 
-<!-- Header untuk daftar rounds -->
 <div class="list-header">
     <span>PERIODE</span>
     <span>NUMBER</span>
     <span>HASIL</span>
 </div>
 
-<!-- List untuk daftar rounds -->
 <ul class="rounds-list" id="roundsList"></ul>
 
-<!-- Tombol kembali ke index.html -->
 <div>
     <a href="index.html" class="button button-green">Kembali ke Menu</a>
 </div>
@@ -153,7 +141,6 @@
 <script>
     let lastDigit = null;
 
-    // Fungsi untuk mengonversi number ke emoji warna
     function getColorEmoji(number) {
         switch (number) {
             case 0: return "🔴⚪🟣";
@@ -170,20 +157,11 @@
         }
     }
 
-    // Fungsi untuk mendapatkan kelas warna berdasarkan digit atau item.number
     function getDigitColorClass(number) {
         switch (number) {
-            case 0:
-            case 2:
-            case 4:
-            case 6:
-            case 8:
+            case 0: case 2: case 4: case 6: case 8:
                 return "digit-red";
-            case 1:
-            case 3:
-            case 5:
-            case 7:
-            case 9:
+            case 1: case 3: case 5: case 7: case 9:
                 return "digit-green";
             default:
                 return "";
@@ -192,19 +170,26 @@
 
     async function fetchData() {
         try {
-            const res = await fetch("proxy_st.php");
-            const data = await res.json();
+            const curRes = await fetch("https://didihub111.top/api/main/lottery/curRound?type=1");
+            const curData = await curRes.json();
+
+            const roundsRes = await fetch("https://didihub111.top/api/main/lottery/rounds?page=1&count=11&type=1");
+            const roundsData = await roundsRes.json();
+
+            const data = {
+                period: curData.period || "-",
+                items: roundsData.items || []
+            };
 
             const now = new Date();
             const currentTime = now.toLocaleTimeString();
 
-            // Update data horizontal atas
             document.getElementById("period").innerText = data.period;
 
             const items = data.items;
-            if (items.length > 11) { // Pastikan ada setidaknya 12 item (indeks 0 sampai 11)
-                const second = items[0].number; // Number ke-2 (indeks 1)
-                const twelfth = items[11].number; // Number ke-12 (indeks 11)
+            if (items.length > 11) {
+                const second = items[0].number;
+                const twelfth = items[11].number;
                 const digit = (second + twelfth) % 10;
 
                 const digitEl = document.getElementById("digit");
@@ -216,7 +201,6 @@
                 }
                 lastDigit = digit;
 
-                // Mengisi daftar rounds
                 const roundsList = document.getElementById("roundsList");
                 roundsList.innerHTML = "";
                 items.forEach(item => {
@@ -241,6 +225,5 @@
     fetchData();
     setInterval(fetchData, 1000);
 </script>
-
 </body>
 </html>
