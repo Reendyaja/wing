@@ -1,37 +1,556 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Button Navigation</title>
+    <title>Live Wingo</title>
     <style>
         body {
-            background-color: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #2E3B4E;
+            color: #FFFFFF;
         }
-        .button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 20px;
-            font-weight: bold;
-            margin: 5px;
-            cursor: pointer;
-            color: white;
-            background-color: #4CAF50;
-            width: 150px;
+
+        .data-what {
+            font-weight: 700;
+            padding: 14px 20px;
+            border-radius: 16px;
+            background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(0, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+
+        .data-what::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(0, 255, 255, 0.2),
+                transparent
+            );
+            transition: left 0.5s;
+        }
+
+        .data-what:hover::before {
+            left: 100%;
+        }
+
+        .data-what:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0, 255, 255, 0.3);
+            border-color: rgba(0, 255, 255, 0.6);
+        }
+
+        .data-what span {
+            flex: 1;
             text-align: center;
-            text-decoration: none;
-            display: block;
+            font-size: 1.4rem;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5), 0 0 10px rgba(0, 255, 255, 0.3);
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+            z-index: 1;
+        }
+
+        .data-what span:hover {
+            color: #00ffcc;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        @keyframes pulseGlow {
+            0% {
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(0, 255, 255, 0.1);
+            }
+            50% {
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(0, 255, 255, 0.2);
+            }
+            100% {
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(0, 255, 255, 0.1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .data-what {
+                padding: 12px 16px;
+                border-radius: 12px;
+            }
+
+            .data-what span {
+                font-size: 1.1rem;
+                letter-spacing: 0.8px;
+            }
+
+            .rounds-list li span {
+                font-size: 11px;
+            }
+
+            .stat-button {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+        }
+
+        .data-header {
+            font-weight: bold;
+            padding: 8px;
+            background-color: #3A4A61;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .data-header span {
+            flex: 1;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .data-row {
+            font-weight: bold;
+            padding: 8px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background-color: #3A4A61;
+            border-radius: 10px;
+        }
+        .data-row span {
+            flex: 1;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .digit-img {
+            width: 30px;
+            height: auto;
+            vertical-align: middle;
+        }
+
+        .list-header {
+            font-weight: bold;
+            padding: 8px;
+            background-color: #3A4A61;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-rows: repeat(3, auto);
+            gap: 10px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .stat-button {
+            flex: 1 1 100px;
+            text-align: center;
+            font-size: 16px;
+            margin: 5px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: default;
+        }
+
+        .stat-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .totalB {
+            background-color: #2B547E; /* Light blue */
+        }
+
+        .totalK {
+            background-color: #87CEEB; /* Dark blue */
+        }
+
+        .totalKM {
+            background: linear-gradient(90deg, #87CEEB 50%, #FF5C5C 50%); /* Half light blue, half red */
+        }
+
+        .totalKH {
+            background: linear-gradient(90deg, #87CEEB 50%, #4CAF50 50%); /* Half light blue, half green */
+        }
+
+        .totalBM {
+            background: linear-gradient(90deg, #2B547E 50%, #FF5C5C 50%); /* Half dark blue, half red */
+        }
+
+        .totalBH {
+            background: linear-gradient(90deg, #2B547E  50%, #4CAF50 50%); /* Half dark blue, half green */
+        }
+
+        .totalJP {
+            background-color: #FFEB3B; /* Yellow */
+            color: #333333; /* Darker text for contrast */
+        }
+
+        .totalM {
+            background-color: #FF5C5C; /* Red for Merah */
+        }
+
+        .totalH {
+            background-color: #4CAF50; /* Green for Hijau */
+        }
+
+        .totalU {
+            background-color: #800080; /* Purple for Unique (0,5) */
+        }
+
+        .status-win {
+            background-color: #4CAF50; /* Green for WIN */
+            padding: 5px 1px;
+            border-radius: 10px;
+        }
+
+        .status-lose {
+            background-color: #FF5C5C; /* Red for LOSE */
+            padding: 5px 1px;
+            border-radius: 10px;
+        }
+
+        .status-jp {
+            background-color: #FFEB3B; /* Yellow for JP */
+            color: #333333; /* Darker text for contrast */
+            padding: 5px 1px;
+            border-radius: 10px;
+        }
+
+        .rounds-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+            max-height: 550px;
+            overflow-y: auto;
+        }
+        .rounds-list li {
+            font-weight: bold;
+            padding: 8px;
+            background-color: #3A4A61;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            align-items: center;
+        }
+        .rounds-list li span {
+            flex: 1;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 8px;
+            cursor: pointer;
+            color: #ffffff;
+            background: linear-gradient(135deg, #1e1e1e 0%, #2c2c2c 100%);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .button:hover {
+            background: linear-gradient(135deg, #3a3a3a 0%, #4a4a4a 100%);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7), 0 0 10px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left:50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .button-green {
+            background-color: #4CAF50;
         }
     </style>
 </head>
 <body>
-    <div>
-        <a href="sc.html" class="button">SUPER CEPAT</a>
-        <a href="c.html" class="button">CEPAT</a>
-        <a href="st.html" class="button">STANDAR</a>
+<div class="data-what">
+    <span>PREDIKSI WINGO - CEPAT</span>
+</div>
+
+<div class="data-header">
+    <span>PERIODE</span>
+    <span>PREDIKSI</span>
+    <span>WAKTU</span>
+</div>
+
+<div class="data-row" id="dataRow">
+    <span id="period">-</span>
+    <span id="digit"><img id="digit-img" class="digit-img" src="" alt="Digit"></span>
+    <span id="now">-</span>
+</div>
+
+<div class="data-header">
+    <span>PERIODE</span>
+    <span>DIDIHUB</span>
+    <span>PREDIKSI</span>
+    <span>B/K</span>
+    <span>H/M</span>
+</div>
+
+<ul class="rounds-list" id="roundsList"></ul>
+
+<div class="list-header8">
+    <div class="row">
+        <span class="stat-button totalH">Hijau: <span id="totalH"></span></span>
+        <span class="stat-button totalU">Ungu: <span id="totalU"></span></span>
+        <span class="stat-button totalM">Merah: <span id="totalM"></span></span>
     </div>
+    <div class="row">
+        <span class="stat-button totalK">Kecil: <span id="totalK"></span></span>
+        <span class="stat-button totalJP">JP: <span id="totalJP"></span></span>
+        <span class="stat-button totalB">Besar: <span id="totalB"></span></span>
+    </div>
+    <div class="row">
+        <span class="stat-button totalKM">K/M: <span id="totalKM"></span></span>
+        <span class="stat-button totalKH">K/H: <span id="totalKH"></span></span>
+        <span class="stat-button totalBM">B/M: <span id="totalBM"></span></span>
+        <span class="stat-button totalBH">B/H: <span id="totalBH"></span></span>
+    </div>
+    </div>
+</div>
+
+
+
+<script>
+const digitImages = {
+    0: "https://55d8krb.com/assets/png/n0-30bd92d1.png",
+    1: "https://55d8krb.com/assets/png/n1-dfccbff5.png",
+    2: "https://55d8krb.com/assets/png/n2-c2913607.png",
+    3: "https://55d8krb.com/assets/png/n3-f92c313f.png",
+    4: "https://55d8krb.com/assets/png/n4-cb84933b.png",
+    5: "https://55d8krb.com/assets/png/n5-49d0e9c5.png",
+    6: "https://55d8krb.com/assets/png/n6-a56e0b9a.png",
+    7: "https://55d8krb.com/assets/png/n7-5961a17f.png",
+    8: "https://55d8krb.com/assets/png/n8-d4d951a4.png",
+    9: "https://55d8krb.com/assets/png/n9-a20f6f42.png"
+};
+
+let lastHasil = null;
+
+function getTimeRemaining(endTime) {
+    const now = new Date();
+    const end = new Date(endTime);
+    const diffMs = end - now;
+
+    if (diffMs <= 0) {
+        return "00:00";
+    }
+
+    const minutes = Math.floor(diffMs / 1000 / 60);
+    const seconds = Math.floor((diffMs / 1000) % 60);
+    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+}
+
+function getBKStatus(lastHasil, digit) {
+    if (lastHasil === digit) {
+        return { text: "JP", class: "status-jp" };
+    } else if (
+        ([0, 1, 2, 3, 4].includes(lastHasil) && [0, 1, 2, 3, 4].includes(digit)) ||
+        ([5, 6, 7, 8, 9].includes(lastHasil) && [5, 6, 7, 8, 9].includes(digit))
+    ) {
+        return { text: "WIN", class: "status-win" };
+    } else if (
+        ([0, 1, 2, 3, 4].includes(lastHasil) && [5, 6, 7, 8, 9].includes(digit)) ||
+        ([5, 6, 7, 8, 9].includes(lastHasil) && [0, 1, 2, 3, 4].includes(digit))
+    ) {
+        return { text: "LOSE", class: "status-lose" };
+    }
+    return { text: "-", class: "" };
+}
+
+function getNewStatus(lastHasil, digit) {
+    if (lastHasil === digit) {
+        return { text: "JP", class: "status-jp" };
+    } else if (
+        ([1, 3, 5, 7, 9].includes(lastHasil) && [1, 3, 5, 7, 9].includes(digit)) ||
+        ([0, 2, 4, 6, 8].includes(lastHasil) && [0, 2, 4, 6, 8].includes(digit))
+    ) {
+        return { text: "WIN", class: "status-win" };
+    } else if (
+        ([1, 3, 5, 7, 9].includes(lastHasil) && [0, 2, 4, 6, 8].includes(digit)) ||
+        ([0, 2, 4, 6, 8].includes(lastHasil) && [1, 3, 5, 7, 9].includes(digit))
+    ) {
+        return { text: "LOSE", class: "status-lose" };
+    }
+    return { text: "-", class: "" };
+}
+
+async function fetchData() {
+    try {
+        const res = await fetch("proxy_c.php");
+        const data = await res.json();
+
+        const timeRemaining = data.endTime ? getTimeRemaining(data.endTime) : "-";
+
+        document.getElementById("period").innerText = data.period;
+
+        const items = data.items;
+        if (items.length >= 11) {
+            const number1 = items[0].number;
+            const number2 = items[10].number;
+            const number3 = items[10].number;
+            const digit = (number1 + number2) % 10;
+
+            const digitImg = document.getElementById("digit-img");
+            digitImg.src = digitImages[digit] || "";
+            digitImg.alt = `Digit ${digit}`;
+
+            lastHasil = digit;
+
+            const roundsList = document.getElementById("roundsList");
+            roundsList.innerHTML = "";
+
+            let stats = {
+                totalB: 0, // 5,6,7,8,9
+                totalK: 0, // 0,1,2,3,4
+                totalKM: 0, // 0,2,4
+                totalKH: 0, // 1,3
+                totalBM: 0, // 6,8
+                totalBH: 0, // 5,7,9
+                totalJP: 0, // JP matches
+                totalM: 0, // 0,2,4,6,8
+                totalH: 0, // 1,3,5,7,9
+                totalU: 0, // 0,5
+                totalBKWin: 0,
+                totalBKLose: 0,
+                totalHMWin: 0,
+                totalHMLose: 0
+            };
+
+            for (let index = 0; index < 200; index++) {
+                const item = items[index];
+                let itemLastHasil = "-";
+
+                // Calculate statistics
+                const number = item.number;
+                if ([5, 6, 7, 8, 9].includes(number)) stats.totalB++;
+                if ([0, 1, 2, 3, 4].includes(number)) stats.totalK++;
+                if ([0, 2, 4].includes(number)) stats.totalKM++;
+                if ([1, 3].includes(number)) stats.totalKH++;
+                if ([6, 8].includes(number)) stats.totalBM++;
+                if ([5, 7, 9].includes(number)) stats.totalBH++;
+                if ([0, 2, 4, 6, 8].includes(number)) stats.totalM++;
+                if ([1, 3, 5, 7, 9].includes(number)) stats.totalH++;
+                if ([0, 5].includes(number)) stats.totalU++;
+
+                if (index <= items.length - 12) {
+                    const nextHasil1 = items[index + 1].number;
+                    const nextHasil2 = items[index + 11].number;
+                    const nextHasil3 = items[index + 11].number;
+                    itemLastHasil = (nextHasil1 + nextHasil2) % 10;
+
+                    if (itemLastHasil === item.number) {
+                        stats.totalJP++;
+                    }
+
+                    // B/K and H/M logic
+                    const bkResult = getBKStatus(itemLastHasil, item.number);
+                    const hmResult = getNewStatus(itemLastHasil, item.number);
+
+                    if (bkResult.text === "WIN") stats.totalBKWin++;
+                    if (bkResult.text === "LOSE") stats.totalBKLose++;
+                    if (hmResult.text === "WIN") stats.totalHMWin++;
+                    if (hmResult.text === "LOSE") stats.totalHMLose++;
+
+                    const li = document.createElement("li");
+                    li.innerHTML = `<span>${item.period}</span>
+                                    <span><img src="${digitImages[item.number] || ''}" class="digit-img" alt="Digit ${item.number}"></span>
+                                    <span><img src="${digitImages[itemLastHasil] || ''}" class="digit-img" alt="Digit ${itemLastHasil}"></span>
+                                    <span class="${bkResult.class}">${bkResult.text}</span>
+                                    <span class="${hmResult.class}">${hmResult.text}</span>`;
+                    roundsList.appendChild(li);
+                }
+            }
+
+            // Update list-header with all statistics
+            document.getElementById("totalB").innerText = stats.totalB;
+            document.getElementById("totalK").innerText = stats.totalK;
+            document.getElementById("totalKM").innerText = stats.totalKM;
+            document.getElementById("totalKH").innerText = stats.totalKH;
+            document.getElementById("totalBM").innerText = stats.totalBM;
+            document.getElementById("totalBH").innerText = stats.totalBH;
+            document.getElementById("totalJP").innerText = stats.totalJP;
+            document.getElementById("totalM").innerText = stats.totalM;
+            document.getElementById("totalH").innerText = stats.totalH;
+            document.getElementById("totalU").innerText = stats.totalU;
+        } else {
+            const digitImg = document.getElementById("digit-img");
+            digitImg.src = "";
+            digitImg.alt = "No Digit";
+            const roundsList = document.getElementById("roundsList");
+            roundsList.innerHTML = "<li><span colspan='5'>Data tidak cukup untuk perhitungan</span></li>";
+            document.getElementById("totalB").innerText = "0";
+            document.getElementById("totalK").innerText = "0";
+            document.getElementById("totalKM").innerText = "0";
+            document.getElementById("totalKH").innerText = "0";
+            document.getElementById("totalBM").innerText = "0";
+            document.getElementById("totalBH").innerText = "0";
+            document.getElementById("totalJP").innerText = "0";
+            document.getElementById("totalM").innerText = "0";
+            document.getElementById("totalH").innerText = "0";
+            document.getElementById("totalU").innerText = "0";
+        }
+
+        document.getElementById("now").innerText = timeRemaining;
+    } catch (e) {
+        document.getElementById("totalB").innerText = "0";
+        document.getElementById("totalK").innerText = "0";
+        document.getElementById("totalKM").innerText = "0";
+        document.getElementById("totalKH").innerText = "0";
+        document.getElementById("totalBM").innerText = "0";
+        document.getElementById("totalBH").innerText = "0";
+        document.getElementById("totalJP").innerText = "0";
+        document.getElementById("totalM").innerText = "0";
+        document.getElementById("totalH").innerText = "0";
+        document.getElementById("totalU").innerText = "0";
+        document.getElementById("now").innerText = "-";
+    }
+}
+
+fetchData();
+setInterval(fetchData, 1000);
+</script>
 </body>
 </html>
